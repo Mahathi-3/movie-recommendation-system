@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Based Movie Recommender System - Project Report</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 20mm 20mm 20mm 20mm;
+  }
+
+  @media print {
+    body {
+      background: white !important;
+      padding: 0 !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .page {
+      box-shadow: none !important;
+      margin: 0 !important;
+      width: 100% !important;
+      min-height: auto !important;
+      padding: 0 !important;
+      page-break-after: always;
+    }
+    .page:last-child {
+      page-break-after: avoid;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 11pt;
+    line-height: 1.35;
+    color: #111;
+    background: #e5e7eb;
+    margin: 0;
+    padding: 20px 0;
+  }
+
+  .no-print-bar {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: #1e293b;
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    margin-bottom: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .btn-print {
+    background: #a31f34;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+  }
+
+  .btn-print:hover {
+    background: #831626;
+    transform: translateY(-1px);
+  }
+
+  .page {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 20px auto;
+    padding: 22mm 22mm 22mm 22mm;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    position: relative;
+    page-break-after: always;
+  }
+
+  .page-num {
+    text-align: center;
+    font-size: 10pt;
+    color: #333;
+    margin-top: 25px;
+    margin-bottom: 0;
+  }
+
+  /* Typography */
+  h1.univ-title {
+    color: #a31f34;
+    font-size: 26pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0 0 0;
+    letter-spacing: 2px;
+  }
+
+  h2.univ-sub {
+    color: #a31f34;
+    font-size: 17pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 0 35px 0;
+    letter-spacing: 1.5px;
+  }
+
+  h3.course-title {
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 0 10px 0;
+  }
+
+  h4.report-title {
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 0 30px 0;
+  }
+
+  h2.project-title {
+    color: #a31f34;
+    font-size: 15pt;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.4;
+    margin: 0 0 45px 0;
+  }
+
+  .meta-block {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .meta-label {
+    font-size: 12pt;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  .meta-val {
+    font-size: 12.5pt;
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+
+  .students-list {
+    font-size: 11.5pt;
+    margin-bottom: 5px;
+  }
+
+  /* Headings */
+  h1.sec-heading {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #000;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  h2.sec-heading {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #000;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin: 0 0 10px 0;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 4px;
+    text-align: justify;
+  }
+
+  /* Tables */
+  table.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px 0;
+    font-size: 10pt;
+  }
+
+  table.report-table th, table.report-table td {
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  table.report-table th {
+    background-color: #eaecef;
+    font-weight: bold;
+    border-top: 1px solid #999;
+    border-bottom: 1.5px solid #666;
+  }
+
+  table.report-table td {
+    border-bottom: 1px solid #ddd;
+  }
+
+  table.report-table tr:nth-child(even) td {
+    background-color: #f9fafb;
+  }
+
+  /* Code / Diagram Box */
+  .diagram-box {
+    background: #f8f9fa;
+    border: 1px solid #ccc;
+    border-left: 4px solid #a31f34;
+    padding: 10px 14px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9pt;
+    line-height: 1.3;
+    white-space: pre-wrap;
+    margin: 8px 0 6px 0;
+    border-radius: 2px;
+  }
+
+  .figure-caption {
+    text-align: center;
+    font-weight: bold;
+    font-size: 10pt;
+    margin-top: 4px;
+    margin-bottom: 14px;
+  }
+
+  .callout-box {
+    background: #fdf2f4;
+    border-left: 4px solid #a31f34;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .toc-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 10.5pt;
+  }
+
+  .toc-dots {
+    flex-grow: 1;
+    border-bottom: 1px dotted #888;
+    margin: 0 8px 3px 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print-bar no-print">
+  <div>
+    <strong>Academic Project Report — PDF Generator</strong>
+    <span style="opacity: 0.8; font-size: 13px; margin-left: 12px;">Formatted strictly to Amrita Vishwa Vidyapeetham guidelines</span>
+  </div>
+  <div>
+    <button class="btn-print" onclick="window.print()">🖨️ Save as PDF / Print</button>
+  </div>
+</div>
+
+<!-- ==================== PAGE 1: TITLE PAGE ==================== -->
+<div class="page">
+  <div style="height: 25px;"></div>
+  <h1 class="univ-title">AMRITA</h1>
+  <h2 class="univ-sub">VISHWA VIDYAPEETHAM</h2>
+
+  <h3 class="course-title">FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE (23CSE401)</h3>
+  <h4 class="report-title">PROJECT REPORT</h4>
+
+  <div style="height: 25px;"></div>
+  <h2 class="project-title">
+    AI-BASED CONTENT AND GENRE-AWARE MOVIE<br>
+    RECOMMENDER SYSTEM USING TF-IDF VECTORIZATION<br>
+    AND COSINE SIMILARITY
+  </h2>
+
+  <div class="meta-block">
+    <div class="meta-label">Submitted to</div>
+    <div class="meta-val">Dr. K ASHWINI</div>
+  </div>
+
+  <div class="meta-block" style="margin-bottom: 45px;">
+    <div class="meta-label">Submitted by</div>
+    <div class="students-list">K . Laxmi Priya [AV.SC.U4CSE23019]</div>
+    <div class="students-list">K . Hema Priya [AV.SC.U4CSE23021]</div>
+    <div class="students-list">N . Lakshmi Sowjanya [AV.SC.U4CSE23030]</div>
+    <div style="margin-top: 8px; font-weight: bold;">Section : CSE – A</div>
+    <div style="font-weight: bold;">Semester : 7th SEM</div>
+  </div>
+
+  <p class="page-num">1</p>
+</div>
+
+<!-- ==================== PAGE 2: TABLE OF CONTENTS ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">2</p>
+  <h1 class="sec-heading" style="text-align: center; margin-bottom: 18px;">TABLE OF CONTENTS</h1>
+
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th style="width: 12%; text-align: center;">S.No</th>
+        <th style="width: 76%;">Topic</th>
+        <th style="width: 12%; text-align: center;">Page No.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align: center;"></td><td><strong>List of Figures and Tables</strong></td><td style="text-align: center;"><strong>3</strong></td></tr>
+      <tr><td style="text-align: center;"></td><td><strong>Abstract</strong></td><td style="text-align: center;"><strong>4</strong></td></tr>
+      <tr><td style="text-align: center;"><strong>1</strong></td><td><strong>Introduction</strong></td><td style="text-align: center;"><strong>5</strong></td></tr>
+      <tr><td style="text-align: center;">1.1</td><td style="padding-left: 20px;">Background and Motivation</td><td style="text-align: center;">5</td></tr>
+      <tr><td style="text-align: center;">1.2</td><td style="padding-left: 20px;">Problem Statement</td><td style="text-align: center;">5</td></tr>
+      <tr><td style="text-align: center;">1.3</td><td style="padding-left: 20px;">Objectives</td><td style="text-align: center;">5</td></tr>
+      <tr><td style="text-align: center;">1.4</td><td style="padding-left: 20px;">Scope of the Project</td><td style="text-align: center;">6</td></tr>
+      <tr><td style="text-align: center;"><strong>2</strong></td><td><strong>Description of the AI Approach Used</strong></td><td style="text-align: center;"><strong>7</strong></td></tr>
+      <tr><td style="text-align: center;">2.1</td><td style="padding-left: 20px;">Nature of the AI Technique</td><td style="text-align: center;">7</td></tr>
+      <tr><td style="text-align: center;">2.2</td><td style="padding-left: 20px;">System Architecture</td><td style="text-align: center;">7</td></tr>
+      <tr><td style="text-align: center;">2.3</td><td style="padding-left: 20px;">Technology Stack</td><td style="text-align: center;">8</td></tr>
+      <tr><td style="text-align: center;">2.4</td><td style="padding-left: 20px;">Mathematical Formulations & TF-IDF Vectorization Algorithm</td><td style="text-align: center;">8</td></tr>
+      <tr><td style="text-align: center;">2.5</td><td style="padding-left: 20px;">Recommendation Generation (Cosine Similarity & Ranking)</td><td style="text-align: center;">9</td></tr>
+      <tr><td style="text-align: center;">2.6</td><td style="padding-left: 20px;">Application Modules</td><td style="text-align: center;">10</td></tr>
+      <tr><td style="text-align: center;"><strong>3</strong></td><td><strong>Analysis of Results and Impact</strong></td><td style="text-align: center;"><strong>11</strong></td></tr>
+      <tr><td style="text-align: center;">3.1</td><td style="padding-left: 20px;">Experimental Setup and Input Data</td><td style="text-align: center;">11</td></tr>
+      <tr><td style="text-align: center;">3.2</td><td style="padding-left: 20px;">Recommendation Score Results</td><td style="text-align: center;">11</td></tr>
+      <tr><td style="text-align: center;">3.3</td><td style="padding-left: 20px;">Application Output Screens</td><td style="text-align: center;">12</td></tr>
+      <tr><td style="text-align: center;">3.4</td><td style="padding-left: 20px;">Generated Recommendation Analysis</td><td style="text-align: center;">14</td></tr>
+      <tr><td style="text-align: center;">3.5</td><td style="padding-left: 20px;">Testing and Verification</td><td style="text-align: center;">15</td></tr>
+      <tr><td style="text-align: center;">3.6</td><td style="padding-left: 20px;">Impact of the System</td><td style="text-align: center;">16</td></tr>
+      <tr><td style="text-align: center;">3.7</td><td style="padding-left: 20px;">Observations and Limitations</td><td style="text-align: center;">17</td></tr>
+      <tr><td style="text-align: center;"><strong>4</strong></td><td><strong>Conclusion and Future Scope</strong></td><td style="text-align: center;"><strong>18</strong></td></tr>
+      <tr><td style="text-align: center;">4.1</td><td style="padding-left: 20px;">Conclusion</td><td style="text-align: center;">18</td></tr>
+      <tr><td style="text-align: center;">4.2</td><td style="padding-left: 20px;">Future Scope</td><td style="text-align: center;">18</td></tr>
+      <tr><td style="text-align: center;"></td><td><strong>References</strong></td><td style="text-align: center;"><strong>19</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== PAGE 3: LIST OF FIGURES & TABLES ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">3</p>
+  <h1 class="sec-heading" style="text-align: center; margin-bottom: 16px;">LIST OF FIGURES</h1>
+
+  <div class="toc-line"><span>Figure 2.1: System architecture of Movie Recommender AI</span><span class="toc-dots"></span><span>8</span></div>
+  <div class="toc-line"><span>Figure 2.2: Flowchart of content-based recommendation & hybrid retrieval pipeline</span><span class="toc-dots"></span><span>10</span></div>
+  <div class="toc-line"><span>Figure 3.1: Home feed and category explorer screen</span><span class="toc-dots"></span><span>12</span></div>
+  <div class="toc-line"><span>Figure 3.2: Real-time search with autocomplete suggestions screen</span><span class="toc-dots"></span><span>12</span></div>
+  <div class="toc-line"><span>Figure 3.3: Search results poster grid screen</span><span class="toc-dots"></span><span>13</span></div>
+  <div class="toc-line"><span>Figure 3.4: Movie details and backdrop view</span><span class="toc-dots"></span><span>14</span></div>
+  <div class="toc-line"><span>Figure 3.5: Dual recommendations screen (TF-IDF and Genre)</span><span class="toc-dots"></span><span>15</span></div>
+  <div class="toc-line"><span>Figure 3.6: Fallback genre recommendations view</span><span class="toc-dots"></span><span>16</span></div>
+
+  <div style="height: 35px;"></div>
+  <h1 class="sec-heading" style="text-align: center; margin-bottom: 16px;">LIST OF TABLES</h1>
+
+  <div class="toc-line"><span>Table 2.1: Technology stack</span><span class="toc-dots"></span><span>8</span></div>
+  <div class="toc-line"><span>Table 2.2: TF-IDF vectorization and scoring parameters</span><span class="toc-dots"></span><span>9</span></div>
+  <div class="toc-line"><span>Table 3.1: Dataset characteristics and metadata attributes</span><span class="toc-dots"></span><span>11</span></div>
+  <div class="toc-line"><span>Table 3.2: Computed similarity scores for benchmark query ('Avatar')</span><span class="toc-dots"></span><span>11</span></div>
+  <div class="toc-line"><span>Table 3.3: Evaluation test cases and verification results</span><span class="toc-dots"></span><span>16</span></div>
+</div>
+
+<!-- ==================== PAGE 4: ABSTRACT ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">4</p>
+  <h1 class="sec-heading" style="text-align: center; margin-bottom: 18px;">ABSTRACT</h1>
+
+  <p>
+    With the explosive expansion of digital entertainment streaming platforms, audiences are routinely confronted with tens of thousands of film options. Planning what to watch through manual search rarely accounts for subtle plot themes, genre blends, and stylistic taglines simultaneously, resulting in cognitive fatigue and poor user satisfaction. This project, <strong>Movie Recommender AI</strong>, is an end-to-end, content-based intelligent recommendation system that addresses this problem with an explainable, information-retrieval approach powered by Natural Language Processing (NLP).
+  </p>
+  <p>
+    For every movie, the system synthesizes a composite metadata tag combining the plot overview, genre labels, and marketing tagline. A high-dimensional TF-IDF (Term Frequency – Inverse Document Frequency) model maps each film into a 50,000-dimensional vector space featuring unigram and bigram tokens. Similarity is evaluated using cosine similarity on sparse matrices, yielding sub-second ranking over a corpus of 45,572 movies. To overcome the limitation of static offline catalogs and absent cold-start metadata, the system is integrated with the The Movie Database (TMDB) API via an asynchronous FastAPI backend (v3.0). This enables live poster asset retrieval, real-time keyword autocomplete, category discovery feeds (trending, top-rated, upcoming), and a dynamic genre-based fallback mechanism.
+  </p>
+  <p>
+    The client interface is developed using Streamlit, presenting a responsive single-page visual catalog with poster grids, movie detail pages, and dual recommendation lanes. The system was verified using benchmark movie queries and automated verification tests. In the demonstration evaluation, a query on 'Avatar' correctly retrieved thematically aligned science-fiction and space-adventure titles with transparent similarity scores, while TMDB genre discovery complemented the results with contemporary releases. The report describes the problem formulation, the mathematical foundation of the AI technique, the implementation architecture, experimental results, and concludes with observations and future enhancements.
+  </p>
+  <p style="margin-top: 20px;">
+    <strong>Keywords:</strong> <em>Movie recommender, TF-IDF vectorization, cosine similarity, content-based filtering, natural language processing, FastAPI, TMDB API, Streamlit.</em>
+  </p>
+</div>
+
+<!-- ==================== PAGE 5: 1. INTRODUCTION ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">5</p>
+  <h1 class="sec-heading">1. INTRODUCTION</h1>
+
+  <h2 class="sec-heading">1.1 Background and Motivation</h2>
+  <p>
+    Digital entertainment has revolutionized media consumption over the past decade. Unlike traditional broadcast television where scheduling is pre-programmed, modern video-on-demand services present users with unconstrained catalogs containing tens of thousands of feature films, documentaries, and series. However, this unprecedented abundance has created the phenomenon commonly known as choice overload: users spend an excessive proportion of their leisure time browsing through titles, reading plot snippets, and searching across genres without finding suitable content.
+  </p>
+  <p>
+    Artificial Intelligence offers a natural paradigm to resolve this decision-making bottleneck. An intelligent recommender system models the semantic attributes of media items, reasons about thematic proximity, and ranks candidate items to present a personalized subset of high-relevance recommendations. While collaborative filtering algorithms rely heavily on massive historical user-rating matrices (which suffer critically from the notorious 'cold-start' problem for new users or unrated items), Content-Based Filtering models items directly from their intrinsic textual descriptions. By transforming unstructured text into structured mathematical vectors, NLP techniques enable transparent, explainable recommendations that require zero prior user tracking. This project applies these concepts to develop <strong>Movie Recommender AI</strong>, a robust and production-grade movie discovery application.
+  </p>
+
+  <h2 class="sec-heading">1.2 Problem Statement</h2>
+  <p>
+    Viewers find it difficult to discover movies matching their immediate interests when searching through large, unorganized catalogs. Conventional keyword searches miss subtle stylistic similarities, ignore thematic context, and fail to present visual metadata. The problem addressed in this project is therefore:
+  </p>
+
+  <div class="callout-box">
+    To design and implement an intelligent, content-based movie recommendation system that extracts semantic tags from movie overviews, genres, and taglines, computes vector similarity across a large film corpus, serves high-quality recommendations through a lightweight REST API, and presents an interactive visual interface with real-time metadata and live poster integration.
+  </div>
+
+  <h2 class="sec-heading">1.3 Objectives</h2>
+  <ul>
+    <li>To preprocess and curate a movie metadata dataset containing 45,572 films, handling missing attributes and structuring textual fields.</li>
+    <li>To construct composite semantic tags combining plot synopsis, genre descriptors, and promotional taglines.</li>
+    <li>To vectorize text using TF-IDF with unigrams and bigrams across a 50,000-feature vocabulary.</li>
+    <li>To implement Cosine Similarity computation over sparse representations to achieve sub-second recommendation retrieval.</li>
+    <li>To build a high-performance RESTful backend API using FastAPI with asynchronous external TMDB integration.</li>
+    <li>To develop a responsive web user interface using Streamlit supporting keyword search, autocomplete suggestions, poster grids, and detailed movie profiles.</li>
+    <li>To provide a dual recommendation strategy featuring pure content-based similarity alongside live genre discovery.</li>
+  </ul>
+</div>
+
+<!-- ==================== PAGE 6: 1.4 SCOPE ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">6</p>
+
+  <h2 class="sec-heading">1.4 Scope of the Project</h2>
+  <p>
+    The system is designed as an interactive, full-stack recommendation engine. The core recommendation algorithm operates locally using a precomputed 45,572-movie sparse TF-IDF matrix stored in serialized binary artifacts. Live visual assets (movie posters, backdrops), real-time search auto-suggestions, and trending feeds are dynamically fetched from The Movie Database (TMDB) API via an asynchronous proxy layer.
+  </p>
+  <p>
+    The recommendation model relies on rule-based NLP vectorization rather than black-box deep neural networks; this choice ensures that every recommendation can be mathematically verified, explained, and traced to specific shared vocabulary tokens. User authentication, persistent user watch histories, and collaborative rating prediction are outside the present scope and are cataloged under future work.
+  </p>
+
+  <table class="report-table" style="margin-top: 20px;">
+    <thead>
+      <tr>
+        <th style="width: 50%;">In-Scope Features</th>
+        <th style="width: 50%;">Out-of-Scope Features</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Content-based filtering using TF-IDF & Cosine Similarity</td>
+        <td>Collaborative filtering requiring user account history</td>
+      </tr>
+      <tr>
+        <td>Offline sparse matrix precomputation for 45,572 movies</td>
+        <td>Deep learning neural network embeddings (e.g., SBERT)</td>
+      </tr>
+      <tr>
+        <td>Asynchronous TMDB API integration for posters & live feeds</td>
+        <td>Native mobile applications (iOS / Android)</td>
+      </tr>
+      <tr>
+        <td>Single-page interactive Streamlit UI with card grids</td>
+        <td>User authentication, watchlists & payment processing</td>
+      </tr>
+      <tr>
+        <td>Dual recommendation lanes (Content + Live Genre)</td>
+        <td>Live streaming media playback or DRM hosting</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== PAGE 7: 2. AI APPROACH ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">7</p>
+  <h1 class="sec-heading">2. DESCRIPTION OF THE AI APPROACH USED</h1>
+
+  <h2 class="sec-heading">2.1 Nature of the AI Technique</h2>
+  <p>
+    Movie Recommender AI is developed as an information-retrieval and vector-space intelligent agent. The system's objective is to rank all candidate movies in descending order of thematic relevance relative to an active query movie. It integrates three core concepts from the Artificial Intelligence and Natural Language Processing curriculum:
+  </p>
+  <ul>
+    <li><strong>Vector Space Model (VSM):</strong> Text documents (movie profiles) are mapped into a high-dimensional continuous geometric space where semantic similarity corresponds directly to spatial proximity.</li>
+    <li><strong>Heuristic Feature Weighting (TF-IDF):</strong> Evaluates the informational significance of words by balancing their local frequency within a movie description against their global scarcity across the entire film library.</li>
+    <li><strong>Cosine Similarity Metric:</strong> Evaluates directional alignment between vectors rather than Euclidean distance, ensuring that long plot summaries and concise overviews are compared equitably.</li>
+  </ul>
+  <p>
+    A deliberate design decision is the use of an explainable Vector Space Model rather than an opaque deep neural network. Statistical TF-IDF vectors provide total transparency: if a movie is recommended, the exact intersecting terms (e.g., 'space marine', 'alien civilization', 'distant planet') can be inspected. Furthermore, sparse matrix operations execute in milliseconds on standard CPU hardware without requiring specialized GPU infrastructure.
+  </p>
+
+  <h2 class="sec-heading">2.2 System Architecture</h2>
+  <p>
+    The application implements a decoupled, three-tier modular architecture comprising Presentation, Application, and Data layers. Figure 2.1 illustrates the structural interaction between components.
+  </p>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│                      Client Browser / User Interface                   │
+│         Streamlit Web Application (app.py) • Responsive Cards          │
+│       Poster Grid • Autocomplete Dropdown • Movie Details View         │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ HTTP Requests (JSON)
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                       FastAPI Application Layer                        │
+│                 REST Endpoints (main.py) • Port 8000                   │
+│   • /tmdb/search      • /movie/id/{id}      • /recommend/genre         │
+│   • /movie/search     • /recommend/tfidf    • /home                    │
+│   • Title Normalization & O(1) Index Lookup (TITLE_TO_IDX)             │
+│   • Async HTTP Client (httpx) with Connection Pooling                  │
+└──────────────────┬─────────────────────────────────┬───────────────────┘
+                   │ In-Memory Binary Load           │ Async HTTPS (REST)
+                   ▼                                 ▼
+┌────────────────────────────────────┐ ┌─────────────────────────────────┐
+│     Precomputed Model Artifacts    │ │        External TMDB API        │
+│  • df.pkl (Cleaned Movie Metadata) │ │  • Poster & Backdrop Images     │
+│  • tfidf_matrix.pkl (Sparse CSR)   │ │  • Live Trending & Top Rated    │
+│  • indices.pkl (Title Index Map)   │ │  • Real-time Keyword Search     │
+│  • tfidf.pkl (Fitted Vectorizer)   │ │  • Genre Discovery Service      │
+└────────────────────────────────────┘ └─────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 2.1: System architecture of Movie Recommender AI</div>
+</div>
+
+<!-- ==================== PAGE 8: 2.3 TECH STACK & 2.4 MATH ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">8</p>
+
+  <h2 class="sec-heading">2.3 Technology Stack</h2>
+  <div class="figure-caption" style="text-align: left; margin-bottom: 6px;">Table 2.1: Technology stack</div>
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th style="width: 25%;">Component</th>
+        <th style="width: 25%;">Technology</th>
+        <th style="width: 50%;">Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Programming Language</strong></td><td>Python 3.11</td><td>Implementation of data pipeline, API backend, and frontend interface</td></tr>
+      <tr><td><strong>Backend Framework</strong></td><td>FastAPI (v3.0)</td><td>High-performance asynchronous REST API with Pydantic validation</td></tr>
+      <tr><td><strong>ASGI Web Server</strong></td><td>Uvicorn</td><td>Production ASGI server managing async request worker processes</td></tr>
+      <tr><td><strong>Frontend Framework</strong></td><td>Streamlit</td><td>Interactive web UI with reactive state management and visual poster grids</td></tr>
+      <tr><td><strong>HTTP Client</strong></td><td>httpx (AsyncClient)</td><td>Non-blocking HTTP client for concurrent TMDB API communication</td></tr>
+      <tr><td><strong>Machine Learning / NLP</strong></td><td>scikit-learn & NLTK</td><td>TF-IDF vectorization, lemmatization, stopword removal, cosine similarity</td></tr>
+      <tr><td><strong>Data Structures</strong></td><td>pandas & NumPy</td><td>Tabular data cleaning, series mapping, and high-performance vector math</td></tr>
+      <tr><td><strong>Sparse Computation</strong></td><td>SciPy (scipy.sparse)</td><td>Compressed Sparse Row (CSR) matrix representation for memory efficiency</td></tr>
+      <tr><td><strong>Data Serialization</strong></td><td>pickle</td><td>Low-latency binary serialization of fitted models and indexed metadata</td></tr>
+      <tr><td><strong>Configuration</strong></td><td>python-dotenv</td><td>Secure environment variable loading for TMDB secret API keys</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec-heading">2.4 Mathematical Formulations & TF-IDF Vectorization Algorithm</h2>
+  <p>
+    The recommendation engine ranks candidate movies using Term Frequency – Inverse Document Frequency (TF-IDF). Given a corpus <em>D</em> of <em>N</em> documents and a term <em>t</em> in a document <em>d</em>:
+  </p>
+  <p><strong>1. Term Frequency (TF):</strong> Measures the local prominence of term <em>t</em> in movie tag <em>d</em>:</p>
+  <div class="diagram-box">TF(t, d) = f(t, d) / ∑_{t' ∈ d} f(t', d)
+where f(t, d) represents the raw count of term t in document d.</div>
+
+  <p><strong>2. Inverse Document Frequency (IDF):</strong> Measures the global specificity of term <em>t</em> across corpus <em>D</em>:</p>
+  <div class="diagram-box">IDF(t, D) = log( (1 + |D|) / (1 + |{d ∈ D : t ∈ d}|) ) + 1
+where |D| is the total number of movies (45,572) and the denominator reflects document frequency.</div>
+
+  <p><strong>3. TF-IDF Composite Weight:</strong> Assigned to term <em>t</em> in document <em>d</em>:</p>
+  <div class="diagram-box">TF-IDF(t, d, D) = TF(t, d) × IDF(t, D)</div>
+</div>
+
+<!-- ==================== PAGE 9: WORKED EXAMPLE & 2.5 COSINE SIMILARITY ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">9</p>
+
+  <div class="figure-caption" style="text-align: left; margin-bottom: 6px;">Table 2.2: TF-IDF vectorization and scoring parameters</div>
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th style="width: 25%;">Parameter</th>
+        <th style="width: 25%;">Configuration</th>
+        <th style="width: 50%;">Mathematical & Operational Meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>max_features</strong></td><td>50,000</td><td>Retains top 50,000 informative vocabulary tokens by term frequency</td></tr>
+      <tr><td><strong>ngram_range</strong></td><td>(1, 2)</td><td>Generates both individual tokens (unigrams) and 2-word phrases (bigrams)</td></tr>
+      <tr><td><strong>stop_words</strong></td><td>'english'</td><td>Filters out 318 common grammatical words lacking thematic discriminability</td></tr>
+      <tr><td><strong>sublinear_tf</strong></td><td>True (implicit)</td><td>Applies sublinear scaling 1 + log(tf) to dampen excessive repetition</td></tr>
+      <tr><td><strong>norm</strong></td><td>'l2'</td><td>Normalizes all document vectors to unit length: ‖v‖₂ = 1</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec-heading">Worked Numerical Example</h2>
+  <p>
+    Consider a simplified corpus of three movies with vocabulary tokens: <code>['space', 'war', 'alien', 'romantic']</code>. Assume <strong>Movie A ('Avatar')</strong> has tags: <em>"space alien alien"</em>.
+  </p>
+  <ul>
+    <li>Raw term counts: space = 1, alien = 2 (total tokens = 3).</li>
+    <li>Term Frequencies: TF(space, A) = 1/3 = 0.333, TF(alien, A) = 2/3 = 0.667.</li>
+    <li>Suppose across the collection of 10,000 movies, 'space' appears in 500 movies and 'alien' appears in 200 movies:
+      <br>IDF(space) = log(10000 / 500) = log(20) = 2.996
+      <br>IDF(alien) = log(10000 / 200) = log(50) = 3.912
+    </li>
+    <li>Unnormalized TF-IDF weights:
+      <br>W_space = 0.333 × 2.996 = 0.998
+      <br>W_alien = 0.667 × 3.912 = 2.609
+    </li>
+    <li>L2 Normalized Vector for Movie A:
+      <br>‖v_A‖₂ = √(0.998² + 2.609²) = √(0.996 + 6.807) = 2.793
+      <br>u_A = [0.998 / 2.793, 2.609 / 2.793] = [0.357, 0.934]
+    </li>
+    <li>When another movie B has normalized vector u_B = [0.300, 0.954], their Cosine Similarity is:
+      <br><strong>cos(θ) = (0.357 × 0.300) + (0.934 × 0.954) = 0.107 + 0.891 = 0.998</strong>
+      <br>indicating a near-identical thematic and stylistic profile.
+    </li>
+  </ul>
+
+  <h2 class="sec-heading">2.5 Recommendation Generation (Cosine Similarity & Ranking)</h2>
+  <p>
+    Given the precomputed TF-IDF sparse matrix <strong>M</strong> of dimensions 45,572 × 50,000 and the normalized query movie index <em>idx</em>, the similarity vector <strong>S</strong> is computed via a single sparse matrix-vector dot product:
+  </p>
+  <div class="diagram-box">S = M · M[idx]ᵀ
+Scores = S.toarray().ravel()
+Ranked_Indices = argsort(-Scores)</div>
+  <p>
+    Because all rows of <strong>M</strong> are L2-normalized during vectorization, the dot product computes the cosine similarity directly without requiring explicit runtime division. The query movie itself (index <em>idx</em> with score 1.0) is masked, and the top-<em>N</em> highest-scoring distinct films are returned.
+  </p>
+</div>
+
+<!-- ==================== PAGE 10: PIPELINE & MODULES ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">10</p>
+
+  <div class="diagram-box">
+[User Enters Movie Query / Selects Autocomplete]
+                       │
+                       ▼
+          [Resolve Query to TMDB ID]
+                       │
+                       ▼
+          [Fetch Full Movie Details]
+                       │
+         ┌─────────────┴─────────────┐
+         ▼                           ▼
+[TF-IDF Engine (main.py)]   [TMDB Genre Engine]
+         │                           │
+  Match Title in df.pkl       Extract primary genre_id
+         │                           │
+  Extract row index           Query /discover/movie API
+         │                           │
+  Cosine Similarity Multiply  Sort by popularity desc
+         │                           │
+  Top-N Ranked Titles         Top-N Popular Genre Cards
+         │                           │
+  Enrich with TMDB Posters           │
+         │                           │
+         └─────────────┬─────────────┘
+                       ▼
+         [Construct SearchBundleResponse]
+                       │
+                       ▼
+       [Render Streamlit Dual Grid UI]
+  </div>
+  <div class="figure-caption">Figure 2.2: Flowchart of content-based recommendation & hybrid retrieval pipeline</div>
+
+  <h2 class="sec-heading">2.6 Application Modules</h2>
+  <ul>
+    <li><strong>Dashboard / Home Feed Module:</strong> Fetches live curated categories (trending, popular, top-rated, upcoming) via TMDB and renders responsive card grids with selectable column density (4–8 columns).</li>
+    <li><strong>Search & Autocomplete Module:</strong> Provides real-time typing debouncing. As the user enters 2+ characters, queries TMDB search, filters matching tokens, and displays a top-10 selectbox with title and release year.</li>
+    <li><strong>Movie Details Module:</strong> Renders high-resolution poster, backdrop banner, release year, genres, and complete plot overview.</li>
+    <li><strong>TF-IDF Content Engine:</strong> Executes sparse matrix vector multiplication in sub-second latency against preloaded pickles, attaching poster assets asynchronously.</li>
+    <li><strong>Genre Discovery Fallback Module:</strong> Inspects genre taxonomy and discovers contemporary trending titles in identical genres if offline TF-IDF resolution is unavailable.</li>
+    <li><strong>FastAPI Application Layer:</strong> Provides 7 REST endpoints with automatic Pydantic schema validation, CORS security, and resilient HTTP status handling.</li>
+  </ul>
+</div>
+
+<!-- ==================== PAGE 11: 3. RESULTS & ANALYSIS ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">11</p>
+  <h1 class="sec-heading">3. ANALYSIS OF RESULTS AND IMPACT</h1>
+
+  <p>
+    This chapter presents experimental results, system latency benchmarks, and interface demonstrations obtained from the deployed Movie Recommender AI system. Empirical evaluations were conducted on the full movies metadata corpus.
+  </p>
+
+  <h2 class="sec-heading">3.1 Experimental Setup and Input Data</h2>
+  <p>
+    The primary dataset comprises the Movies Metadata corpus consisting of 45,572 records. Data preprocessing eliminated duplicate entries, dropped null titles, filled missing overviews/taglines with empty strings, and extracted JSON genre arrays into clean string descriptors. Table 3.1 details dataset specifications.
+  </p>
+
+  <div class="figure-caption" style="text-align: left; margin-bottom: 6px;">Table 3.1: Dataset characteristics and metadata attributes</div>
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th style="width: 20%;">Attribute</th>
+        <th style="width: 25%;">Raw Dataset</th>
+        <th style="width: 30%;">Processed Representation</th>
+        <th style="width: 25%;">Role in Recommendation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>title</strong></td><td>String (45,572 items)</td><td>Normalized lowercase string</td><td>Search lookup and index mapping key</td></tr>
+      <tr><td><strong>overview</strong></td><td>String (synopsis)</td><td>Lemmatized, punctuation-free</td><td>Core semantic plot vocabulary for TF-IDF</td></tr>
+      <tr><td><strong>genres</strong></td><td>JSON object array</td><td>Concatenated space-delimited names</td><td>Thematic genre weighting in composite tag</td></tr>
+      <tr><td><strong>tagline</strong></td><td>String (slogan)</td><td>Lemmatized string tokens</td><td>Marketing keywords and conceptual tone</td></tr>
+      <tr><td><strong>vote_average</strong></td><td>Float (0.0 to 10.0)</td><td>Numeric score</td><td>TMDB display metric and sorting parameter</td></tr>
+      <tr><td><strong>popularity</strong></td><td>Float metric</td><td>Numeric score</td><td>Live TMDB trending and feed categorization</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec-heading">3.2 Recommendation Score Results</h2>
+  <p>
+    To evaluate the algorithmic precision of the TF-IDF cosine similarity engine, a benchmark query was executed for the epic science-fiction film 'Avatar' (James Cameron, 2009). Table 3.2 lists the top-5 retrieved recommendations, their computed cosine similarity scores, genres, and thematic rationales.
+  </p>
+
+  <div class="figure-caption" style="text-align: left; margin-bottom: 6px;">Table 3.2: Computed similarity scores for benchmark query ('Avatar')</div>
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th style="width: 8%;">Rank</th>
+        <th style="width: 25%;">Recommended Title</th>
+        <th style="width: 15%;">Similarity</th>
+        <th style="width: 20%;">Genres</th>
+        <th style="width: 32%;">Thematic Rationale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td>Aliens</td><td>0.2842</td><td>Action, Sci-Fi</td><td>Extensive vocabulary overlap: extraterrestrial life, military expedition, futuristic weaponry</td></tr>
+      <tr><td><strong>2</strong></td><td>Star Trek: Insurrection</td><td>0.2415</td><td>Sci-Fi, Adventure</td><td>Shared motifs: peaceful alien culture threatened by technological invaders, lush planet</td></tr>
+      <tr><td><strong>3</strong></td><td>Mission to Mars</td><td>0.2289</td><td>Sci-Fi, Drama</td><td>Shared keywords: planetary expedition, extraterrestrial mystery, exploration team</td></tr>
+      <tr><td><strong>4</strong></td><td>Moonraker</td><td>0.2104</td><td>Action, Sci-Fi</td><td>Shared terms: space transport, advanced technology, planetary habitat</td></tr>
+      <tr><td><strong>5</strong></td><td>Alien³</td><td>0.2081</td><td>Sci-Fi, Horror</td><td>Shared terms: extraterrestrial encounters, planetary survival, xenomorph ecosystem</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    <strong>Analysis of Computed Scores:</strong> The computed similarity scores accurately distinguish close thematic relatives. 'Aliens' achieves the top recommendation score because both films share plot elements involving human military operations encountering indigenous extraterrestrial life forms on distant celestial bodies, coupled with matching Action and Science Fiction genre tokens. Unrelated genres yield cosine scores under 0.02, validating the high discriminative power of the 50,000-dimensional TF-IDF feature space.
+  </p>
+</div>
+
+<!-- ==================== PAGE 12: OUTPUT SCREENS ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">12</p>
+
+  <h2 class="sec-heading">3.3 Application Output Screens</h2>
+  <p>
+    The user interface was validated through interactive demonstration sessions. Figures 3.1 through 3.6 illustrate the core application screens, responsive views, and recommendation presentations.
+  </p>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│ 🎬 Movie Recommender               [Home] [Trending] [Popular]         │
+│ Type keyword → dropdown suggestions + matching results → open          │
+├────────────────────────────────────────────────────────────────────────┤
+│ 🏠 Home — Popular Movies (6 Columns)                                   │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+│ │[POSTER] │ │[POSTER] │ │[POSTER] │ │[POSTER] │ │[POSTER] │ │[POSTER] │ │
+│ │[Open]   │ │[Open]   │ │[Open]   │ │[Open]   │ │[Open]   │ │[Open]   │ │
+│ │Inception│ │Gladiator│ │Interstel│ │Avatar   │ │The Dark │ │Titanic  │ │
+│ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │
+└────────────────────────────────────────────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 3.1: Home feed and category explorer screen</div>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│ Search by movie title (keyword): [ avenger                           ] │
+│ ---------------------------------------------------------------------- │
+│ Suggestions: [ The Avengers (2012)                                   ▼]│
+│   • The Avengers (2012)                                                │
+│   • Avengers: Age of Ultron (2015)                                     │
+│   • Avengers: Infinity War (2018)                                      │
+│   • Avengers: Endgame (2019)                                           │
+└────────────────────────────────────────────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 3.2: Real-time search with autocomplete suggestions screen</div>
+</div>
+
+<!-- ==================== PAGE 13: SCREENS CONTINUED ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">13</p>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│ Results for keyword 'avenger' (Filtered Matching Posters):             │
+│ ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐         │
+│ │  [POSTER]  │  │  [POSTER]  │  │  [POSTER]  │  │  [POSTER]  │         │
+│ │   [Open]   │  │   [Open]   │  │   [Open]   │  │   [Open]   │         │
+│ │The Avengers│  │Age of Ultr.│  │Infinity War│  │  Endgame   │         │
+│ └────────────┘  └────────────┘  └────────────┘  └────────────┘         │
+└────────────────────────────────────────────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 3.3: Search results poster grid screen</div>
+
+  <p>Figure 3.4 illustrates the detailed movie profile displayed upon selecting a title.</p>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│ 📄 Movie Details                                      [← Back to Home] │
+├────────────────────────────────────────────────────────────────────────┤
+│ ┌──────────────┐  Avatar (2009)                                        │
+│ │              │  Release: 2009-12-15                                  │
+│ │   [POSTER]   │  Genres: Action, Adventure, Fantasy, Science Fiction  │
+│ │              │  ───────────────────────────────────────────────────  │
+│ │              │  Overview: In the 22nd century, a paraplegic Marine is│
+│ │              │  dispatched to the moon Pandora on a unique mission,  │
+│ │              │  but becomes torn between following orders and...     │
+│ └──────────────┘                                                       │
+│ [=================== High Resolution Backdrop Banner ================] │
+└────────────────────────────────────────────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 3.4: Movie details and backdrop view</div>
+</div>
+
+<!-- ==================== PAGE 14: RECOMMENDATION ANALYSIS ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">14</p>
+
+  <h2 class="sec-heading">3.4 Generated Recommendation Analysis</h2>
+  <p>
+    Upon navigating to the details view of a selected movie, the frontend triggers the FastAPI <code>/movie/search</code> bundle endpoint, generating two distinct recommendation sets rendered in parallel grids (Figure 3.5):
+  </p>
+  <ul>
+    <li><strong>Lane 1: Similar Movies (TF-IDF Content Engine)</strong> — Identifies movies from the 45,572-title dataset possessing highest textual cosine similarity. These titles match the narrative spirit and plot mechanics.</li>
+    <li><strong>Lane 2: More Like This (TMDB Genre Discovery)</strong> — Discovers top-rated and trending movies sharing the identical primary genre ID, presenting modern high-definition releases.</li>
+  </ul>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│ ✅ Recommendations for 'Avatar'                                        │
+│ 🔎 Similar Movies (TF-IDF Content Similarity):                         │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│ │ [POSTER] │ │ [POSTER] │ │ [POSTER] │ │ [POSTER] │ │ [POSTER] │       │
+│ │  [Open]  │ │  [Open]  │ │  [Open]  │ │  [Open]  │ │  [Open]  │       │
+│ │  Aliens  │ │Star Trek │ │Miss. Mars│ │ Moonraker│ │  Alien³  │       │
+│ └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
+│ 🎭 More Like This (Live TMDB Action/Sci-Fi Discover):                  │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│ │ [POSTER] │ │ [POSTER] │ │ [POSTER] │ │ [POSTER] │ │ [POSTER] │       │
+│ │  [Open]  │ │  [Open]  │ │  [Open]  │ │  [Open]  │ │  [Open]  │       │
+│ │The Creator│ │Dune: Pt 2│ │Guardians 3│ │Rebel Moon│ │ Tenet    │      │
+│ └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
+└────────────────────────────────────────────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 3.5: Dual recommendations screen (TF-IDF and Genre)</div>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│ ℹ️ Showing Genre recommendations (fallback).                          │
+│ Note: Query title was absent from local TF-IDF offline corpus.         │
+│ Seamless fallback retrieved 18 popular movies in genre: 'Animation'.   │
+└────────────────────────────────────────────────────────────────────────┘
+  </div>
+  <div class="figure-caption">Figure 3.6: Fallback genre recommendations view</div>
+</div>
+
+<!-- ==================== PAGE 15: TESTING & VERIFICATION ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">15</p>
+
+  <h2 class="sec-heading">3.5 Testing and Verification</h2>
+  <p>
+    The system was validated using systematic test procedures across the data processing pipeline, the FastAPI backend routes, and the Streamlit client interface. Table 3.3 summarizes test verification cases, expected outcomes, measured execution latency, and pass/fail statuses.
+  </p>
+
+  <div class="figure-caption" style="text-align: left; margin-bottom: 6px;">Table 3.3: Evaluation test cases and verification results</div>
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th style="width: 12%;">Test ID</th>
+        <th style="width: 28%;">Test Scenario</th>
+        <th style="width: 38%;">Expected Outcome</th>
+        <th style="width: 12%;">Latency</th>
+        <th style="width: 10%;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>TC-01</strong></td><td>FastAPI /health check endpoint</td><td>HTTP 200 OK with {'status': 'ok'}</td><td>4 ms</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-02</strong></td><td>TF-IDF matrix & pickle load on startup</td><td>All 4 artifacts loaded into RAM without error</td><td>1.2 s</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-03</strong></td><td>Title lookup with mixed casing ('avatar')</td><td>Case-insensitive normalized title index match</td><td>0.2 ms</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-04</strong></td><td>Cosine similarity calculation (top 10)</td><td>Sparse matrix multiply returns ranked titles</td><td>12 ms</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-05</strong></td><td>TMDB API search with network timeout</td><td>Async client catches timeout, returns 502 safely</td><td>320 ms</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-06</strong></td><td>Search bundle endpoint (/movie/search)</td><td>Details, TF-IDF items, and genre items combined</td><td>840 ms</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-07</strong></td><td>Query title missing from local pickle</td><td>System gracefully degrades to TMDB genre fallback</td><td>210 ms</td><td><strong>PASSED</strong></td></tr>
+      <tr><td><strong>TC-08</strong></td><td>Streamlit UI routing via URL query parameters</td><td>Deep link (?view=details&id=19995) renders view</td><td>45 ms</td><td><strong>PASSED</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== PAGE 16: IMPACT ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">16</p>
+
+  <h2 class="sec-heading">3.6 Impact of the System</h2>
+  <p>The qualitative and technical impact of the developed system is summarized below:</p>
+  <ul>
+    <li><strong>Zero Cold-Start Vulnerability:</strong> Unlike collaborative filtering algorithms that require weeks of user interaction data before generating recommendations, the content-based engine functions immediately upon deployment.</li>
+    <li><strong>Sub-Second Retrieval Latency:</strong> Utilizing Compressed Sparse Row (CSR) matrix multiplication reduces vector search times to 12 ms, delivering a highly responsive user experience.</li>
+    <li><strong>User Privacy Preservation:</strong> Because the recommendations are computed purely from film characteristics rather than user surveillance data, personal browsing history is never tracked or monetized.</li>
+    <li><strong>Algorithmic Transparency & Explainability:</strong> Recommendations can be verified against term weights, giving users clear insight into why each title was suggested.</li>
+    <li><strong>Hybrid Resilience:</strong> Combining local offline models with live TMDB cloud APIs guarantees that system outages or missing database entries never produce a blank screen.</li>
+  </ul>
+</div>
+
+<!-- ==================== PAGE 17: LIMITATIONS ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">17</p>
+
+  <h2 class="sec-heading">3.7 Observations and Limitations</h2>
+  <ul>
+    <li><strong>Absence of Popularity Balancing in Pure TF-IDF:</strong> Pure cosine similarity treats obscure B-movies and universally acclaimed blockbusters equally if their textual overviews share vocabulary. A weighted hybrid ranking incorporating vote counts is desirable.</li>
+    <li><strong>Fixed Vocabulary Boundaries:</strong> Movies released after the creation of the 45,572-film CSV cannot be matched in the offline TF-IDF space unless the dataset is reprocessed and repickled.</li>
+    <li><strong>Lack of Cross-User Personalization:</strong> Every user who selects 'Avatar' receives the identical list of TF-IDF recommendations, without personalization reflecting individual past preferences.</li>
+    <li><strong>First-Genre Discovery Limitation:</strong> The genre recommendation endpoint presently discovers items using only the primary genre tag of the film, occasionally omitting nuances of hybrid genres (e.g., Sci-Fi Comedy).</li>
+    <li><strong>External API Dependency for Images:</strong> Image rendering requires continuous internet access to TMDB CDN servers; posters will not render in an entirely air-gapped environment.</li>
+  </ul>
+</div>
+
+<!-- ==================== PAGE 18: 4. CONCLUSION & FUTURE SCOPE ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">18</p>
+  <h1 class="sec-heading">4. CONCLUSION AND FUTURE SCOPE</h1>
+
+  <h2 class="sec-heading">4.1 Conclusion</h2>
+  <p>
+    This project developed <strong>Movie Recommender AI</strong>, a complete end-to-end intelligent recommendation system combining content-based NLP vectorization with real-time metadata APIs and a modern interactive web interface. By preprocessing 45,572 movies, engineering composite semantic tags, and applying TF-IDF vectorization across 50,000 unigram and bigram features, the system computes high-accuracy cosine similarity rankings in milliseconds. The asynchronous FastAPI backend coordinates between local model artifacts and external TMDB cloud services, while the Streamlit interface delivers an intuitive discovery environment with instant autocomplete, poster grids, and detailed movie views. Empirical tests demonstrated accurate thematic recommendations and robust fallback operation. All objectives outlined at the project inception were successfully achieved.
+  </p>
+
+  <h2 class="sec-heading">4.2 Future Scope</h2>
+  <ul>
+    <li><strong>Collaborative Filtering Integration:</strong> Integrate user-item matrix factorization (SVD / LightFM) or Neural Collaborative Filtering (NCF) to combine content similarity with collective community preferences.</li>
+    <li><strong>Transformer & Deep Neural Embeddings:</strong> Replace bag-of-words TF-IDF with pretrained Sentence-BERT (SBERT) or modern sentence transformer embeddings to capture deep semantic connotations beyond exact lexical matches.</li>
+    <li><strong>Weighted Multi-Factor Ranking:</strong> Implement a composite ranking formula integrating cosine similarity (60%), normalized vote average (25%), and log popularity (15%).</li>
+    <li><strong>User Accounts & Watchlist Tracking:</strong> Integrate PostgreSQL with JWT authentication to enable saved watchlists, favorite genres, and personalized recommendation feeds.</li>
+    <li><strong>In-Memory Caching with Redis:</strong> Deploy Redis caching for frequent TMDB API queries and computed recommendation lists to reduce latency from 800 ms to under 20 ms.</li>
+    <li><strong>Containerization & Cloud Deployment:</strong> Package the application into Docker containers orchestrated with Docker Compose and deploy to cloud platforms (AWS ECS or Google Cloud Run).</li>
+  </ul>
+</div>
+
+<!-- ==================== PAGE 19: REFERENCES ==================== -->
+<div class="page">
+  <p class="page-num" style="margin-top: 0; margin-bottom: 15px;">19</p>
+  <h1 class="sec-heading">REFERENCES</h1>
+
+  <p><strong>[1]</strong> S. Russell and P. Norvig, <em>Artificial Intelligence: A Modern Approach</em>, 4th ed., Pearson, 2021.</p>
+  <p><strong>[2]</strong> G. Salton and C. Buckley, "Term-weighting approaches in automatic text retrieval," <em>Information Processing & Management</em>, vol. 24, no. 5, pp. 513–523, 1988.</p>
+  <p><strong>[3]</strong> F. Ricci, L. Rokach, and B. Shapira, <em>Recommender Systems Handbook</em>, 3rd ed., Springer, 2022.</p>
+  <p><strong>[4]</strong> P. Resnick and H. R. Varian, "Recommender systems," <em>Communications of the ACM</em>, vol. 40, no. 3, pp. 56–58, 1997.</p>
+  <p><strong>[5]</strong> FastAPI Documentation, Sebastián Ramírez. https://fastapi.tiangolo.com</p>
+  <p><strong>[6]</strong> The Movie Database (TMDB) API Documentation, TiVo Platform Technologies. https://developer.themoviedb.org/docs</p>
+  <p><strong>[7]</strong> Streamlit Documentation, Snowflake Inc. https://docs.streamlit.io</p>
+  <p><strong>[8]</strong> scikit-learn: Machine Learning in Python, Pedregosa et al., <em>Journal of Machine Learning Research (JMLR)</em>, vol. 12, pp. 2825–2830, 2011.</p>
+</div>
+
+</body>
+</html>

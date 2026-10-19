@@ -1,0 +1,8 @@
+.env
+.venv
+__pycache__
+
+# Large data files (too big for GitHub, keep locally)
+*.pkl
+*.csv
+movies_metadata.csv
